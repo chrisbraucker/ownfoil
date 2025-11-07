@@ -10,7 +10,7 @@ on:
 
 jobs:
   push_to_registry:
-    name: Push Docker image to Docker Hub
+    name: Push image to ${{ env.REGISTRY }}
     if: startsWith(github.ref, 'refs/tags/') || (!startsWith(github.ref, 'refs/heads/dependabot') && !startsWith(github.event.head_commit.message, 'ci') && !startsWith(github.event.head_commit.message, 'doc'))
     runs-on: ubuntu-latest
     steps:
@@ -29,17 +29,19 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to Docker Hub
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: a1ex4/ownfoil
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           flavor: |
             latest=auto
           tags: |
@@ -49,6 +51,7 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
+            type=sha
 
       - name: Set platforms based on branch or tag
         run: |
