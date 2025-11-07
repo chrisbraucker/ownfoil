@@ -2,6 +2,7 @@ import os
 import sys
 import re
 import json
+import unicodedata
 
 import titledb
 from constants import *
@@ -303,6 +304,7 @@ def get_game_info(title_id):
         title_info = [_titles_db[t] for t in list(_titles_db.keys()) if _titles_db[t]['id'] == title_id][0]
         return {
             'name': title_info['name'],
+            'name_ascii': ascii_title(title_info['name']),
             'bannerUrl': title_info['bannerUrl'],
             'iconUrl': title_info['iconUrl'],
             'id': title_info['id'],
@@ -384,3 +386,17 @@ def get_all_existing_dlc(title_id):
                 if app_id.upper() not in dlcs:
                     dlcs.append(app_id.upper())
     return dlcs
+
+def ascii_title(name):
+    ''' Use unicodedata normalization to convert to closest ascii representation,
+    and replace characters that make shell and fs processing harder such as `/` or `&`.
+    This swallows some symbols, such as `’`, so this conversion has to take place first.'''
+
+    # first, replace some known problematic characters with ascii equivalents
+    for search, replace in ASCII_REPLACEMENTS.items():
+        name = name.replace(search, replace)
+    name = unicodedata.normalize('NFD', name).encode('ascii', 'ignore').decode('ascii')
+    # then, replace any remaining problematic characters with safe alternatives
+    for search, replace in ASCII_MANGLING.items():
+        name = name.replace(search, replace)
+    return name
