@@ -33,7 +33,7 @@ def organize_file(file_obj, library_path, organizer_settings, watcher):
             return
         format_data["extension"] = file_obj.extension
         format_data["titleId"] = app.title.title_id
-        format_data["titleName"] = title_info['name']
+        format_data["titleName"] = title_info['name_ascii']
         if not file_obj.multicontent:
             format_data["appId"] = app.app_id
             format_data["appVersion"] = app.app_version
@@ -41,9 +41,9 @@ def organize_file(file_obj, library_path, organizer_settings, watcher):
 
             game_info = titles_lib.get_game_info(app.app_id)
             if app.app_type == APP_TYPE_DLC:
-                format_data["appName"] = game_info['name']
+                format_data["appName"] = game_info['name_ascii']
             else:
-                format_data["appName"] = title_info['name']
+                format_data["appName"] = title_info['name_ascii']
         
         # Format the new relative path and remove leading slash if present
         new_relative_path = template.format(**format_data).lstrip('/')

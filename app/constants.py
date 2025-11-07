@@ -90,6 +90,7 @@ ASCII_REPLACEMENTS = {
     '•': '-',
     '´': "'",
     '`': "'",
+    ': ': '-',
 }
 
 ASCII_MANGLING ={

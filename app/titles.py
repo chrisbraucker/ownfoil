@@ -314,6 +314,7 @@ def get_game_info(title_id):
         logger.error(f"Title ID not found in titledb: {title_id}")
         return {
             'name': 'Unrecognized',
+            'name_ascii': 'Unrecognized',
             'bannerUrl': '//placehold.it/400x200',
             'iconUrl': '',
             'id': title_id + ' not found in titledb',
